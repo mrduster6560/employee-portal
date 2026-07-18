@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { signIn, signUp } from './actions'
 
-export default function LoginPage() {
+function LoginForm() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
@@ -77,5 +77,13 @@ export default function LoginPage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   )
 }
