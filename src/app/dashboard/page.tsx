@@ -2,9 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { clockIn, clockOut, startTaskTimer, stopTaskTimer, markTaskDone } from './actions'
 
 const priorityColor: Record<string, string> = {
-  low: 'bg-gray-100 text-gray-700',
-  medium: 'bg-amber-100 text-amber-700',
-  high: 'bg-red-100 text-red-700',
+  low: 'bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300',
+  medium: 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400',
+  high: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400',
 }
 
 export default async function DashboardPage() {
@@ -18,7 +18,6 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  // Today's open clock record, if any
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
@@ -38,7 +37,6 @@ export default async function DashboardPage() {
     .eq('assigned_to', user.id)
     .order('due_date', { ascending: true })
 
-  // Any currently running timers for this employee
   const { data: runningLogs } = await supabase
     .from('task_time_logs')
     .select('*')
@@ -50,12 +48,12 @@ export default async function DashboardPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 p-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-semibold">Hi, {profile?.full_name}</h1>
-            <p className="text-sm text-gray-500">Employee dashboard</p>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">Hi, {profile?.full_name}</h1>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Employee dashboard</p>
           </div>
 
           {openClockRecord ? (
@@ -73,21 +71,21 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        <h2 className="text-sm font-medium text-gray-500 mb-3">Your tasks</h2>
+        <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-3">Your tasks</h2>
         <div className="space-y-3">
           {tasks?.length === 0 && (
-            <p className="text-sm text-gray-400">No tasks assigned yet.</p>
+            <p className="text-sm text-gray-400 dark:text-neutral-500">No tasks assigned yet.</p>
           )}
 
           {tasks?.map((task) => {
             const runningLog = runningLogByTask.get(task.id)
 
             return (
-              <div key={task.id} className="bg-white rounded-lg shadow-sm p-4">
+              <div key={task.id} className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium">{task.title}</h3>
+                      <h3 className="font-medium text-gray-900 dark:text-neutral-100">{task.title}</h3>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full ${priorityColor[task.priority]}`}
                       >
@@ -95,13 +93,13 @@ export default async function DashboardPage() {
                       </span>
                     </div>
                     {task.description && (
-                      <p className="text-sm text-gray-500 mb-1">{task.description}</p>
+                      <p className="text-sm text-gray-500 dark:text-neutral-400 mb-1">{task.description}</p>
                     )}
                     {task.due_date && (
-                      <p className="text-xs text-gray-400">Due {task.due_date}</p>
+                      <p className="text-xs text-gray-400 dark:text-neutral-500">Due {task.due_date}</p>
                     )}
                   </div>
-                  <span className="text-xs uppercase tracking-wide text-gray-400">
+                  <span className="text-xs uppercase tracking-wide text-gray-400 dark:text-neutral-500">
                     {task.status.replace('_', ' ')}
                   </span>
                 </div>
@@ -123,7 +121,7 @@ export default async function DashboardPage() {
                     )}
 
                     <form action={markTaskDone.bind(null, task.id)}>
-                      <button className="text-xs bg-gray-800 text-white px-3 py-1.5 rounded hover:bg-gray-900">
+                      <button className="text-xs bg-gray-800 dark:bg-neutral-700 text-white px-3 py-1.5 rounded hover:bg-gray-900 dark:hover:bg-neutral-600">
                         Mark done
                       </button>
                     </form>

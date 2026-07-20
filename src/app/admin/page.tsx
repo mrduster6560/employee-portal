@@ -28,7 +28,6 @@ export default async function AdminPage() {
     .select('*')
     .gte('started_at', sevenDaysAgoStr)
 
-  // Build per-employee productivity stats
   const stats = (employees ?? []).map((emp) => {
     const empClockRecords = (clockRecords ?? []).filter((c) => c.employee_id === emp.id)
     const empTasks = (tasks ?? []).filter((t) => t.assigned_to === emp.id)
@@ -41,7 +40,6 @@ export default async function AdminPage() {
     }, 0)
 
     const daysPresent = new Set(empClockRecords.map((c) => c.work_date)).size
-    const onTimeDays = empClockRecords.filter((c) => c.is_on_time).length
 
     const completedTasks = empTasks.filter((t) => t.status === 'done').length
     const completionRate = empTasks.length > 0
@@ -61,42 +59,42 @@ export default async function AdminPage() {
       employee: emp,
       hoursWorked: (totalSeconds / 3600).toFixed(1),
       daysPresent,
-      onTimeDays,
       completedTasks,
       completionRate,
       taskTimeTotals,
       empTasks,
+      empClockRecords,
     }
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 p-6">
       <div className="max-w-5xl mx-auto space-y-8">
-        <h1 className="text-xl font-semibold">Admin dashboard</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">Admin dashboard</h1>
 
         {/* Create + assign task */}
-        <div className="bg-white rounded-lg shadow-sm p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-4">Assign a task</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-5">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-4">Assign a task</h2>
           <form action={createTask} className="grid grid-cols-2 gap-3">
             <input
               name="title"
               placeholder="Task title"
               required
-              className="border rounded px-3 py-2 text-sm col-span-2"
+              className="border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 rounded px-3 py-2 text-sm col-span-2"
             />
             <textarea
               name="description"
               placeholder="Description"
-              className="border rounded px-3 py-2 text-sm col-span-2"
+              className="border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 rounded px-3 py-2 text-sm col-span-2"
               rows={2}
             />
-            <select name="assigned_to" required className="border rounded px-3 py-2 text-sm">
+            <select name="assigned_to" required className="border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 rounded px-3 py-2 text-sm">
               <option value="">Assign to...</option>
               {employees?.map((e) => (
                 <option key={e.id} value={e.id}>{e.full_name}</option>
               ))}
             </select>
-            <select name="priority" defaultValue="medium" className="border rounded px-3 py-2 text-sm">
+            <select name="priority" defaultValue="medium" className="border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 rounded px-3 py-2 text-sm">
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -104,37 +102,35 @@ export default async function AdminPage() {
             <input
               name="due_date"
               type="date"
-              className="border rounded px-3 py-2 text-sm"
+              className="border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 rounded px-3 py-2 text-sm"
             />
-            <button className="bg-black text-white text-sm rounded px-4 py-2 hover:bg-gray-800">
+            <button className="bg-black dark:bg-neutral-100 text-white dark:text-neutral-900 text-sm rounded px-4 py-2 hover:bg-gray-800 dark:hover:bg-white">
               Create task
             </button>
           </form>
         </div>
 
         {/* Productivity table */}
-        <div className="bg-white rounded-lg shadow-sm p-5 overflow-x-auto">
-          <h2 className="text-sm font-medium text-gray-500 mb-4">
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-5 overflow-x-auto">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-4">
             7-day productivity
           </h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-400 border-b">
+              <tr className="text-left text-gray-400 dark:text-neutral-500 border-b border-gray-200 dark:border-neutral-800">
                 <th className="pb-2 pr-4">Employee</th>
                 <th className="pb-2 pr-4">Hours worked</th>
                 <th className="pb-2 pr-4">Days present</th>
-                <th className="pb-2 pr-4">On-time</th>
                 <th className="pb-2 pr-4">Tasks done</th>
                 <th className="pb-2 pr-4">Completion %</th>
               </tr>
             </thead>
             <tbody>
               {stats.map((s) => (
-                <tr key={s.employee.id} className="border-b last:border-0">
+                <tr key={s.employee.id} className="border-b border-gray-100 dark:border-neutral-800 last:border-0 text-gray-900 dark:text-neutral-100">
                   <td className="py-2 pr-4 font-medium">{s.employee.full_name}</td>
                   <td className="py-2 pr-4">{s.hoursWorked}h</td>
                   <td className="py-2 pr-4">{s.daysPresent}</td>
-                  <td className="py-2 pr-4">{s.onTimeDays}</td>
                   <td className="py-2 pr-4">{s.completedTasks}</td>
                   <td className="py-2 pr-4">{s.completionRate}%</td>
                 </tr>
@@ -143,14 +139,43 @@ export default async function AdminPage() {
           </table>
         </div>
 
-        {/* Per-task time totals */}
-        <div className="bg-white rounded-lg shadow-sm p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-4">Time per task</h2>
+        {/* Clock in/out log */}
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-5">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-4">Clock in / out log (last 7 days)</h2>
           <div className="space-y-4">
             {stats.map((s) => (
               <div key={s.employee.id}>
-                <p className="text-sm font-medium mb-1">{s.employee.full_name}</p>
-                <ul className="text-sm text-gray-500 space-y-0.5">
+                <p className="text-sm font-medium mb-1 text-gray-900 dark:text-neutral-100">{s.employee.full_name}</p>
+                <ul className="text-sm text-gray-500 dark:text-neutral-400 space-y-0.5">
+                  {s.empClockRecords.map((c: any) => {
+                    const inTime = new Date(c.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    const outTime = c.clock_out
+                      ? new Date(c.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : 'still clocked in'
+                    return (
+                      <li key={c.id} className="flex justify-between max-w-md">
+                        <span>{c.work_date}</span>
+                        <span>{inTime} → {outTime}</span>
+                      </li>
+                    )
+                  })}
+                  {s.empClockRecords.length === 0 && (
+                    <li className="text-gray-300 dark:text-neutral-600">No clock records yet</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Per-task time totals */}
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-5">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-4">Time per task</h2>
+          <div className="space-y-4">
+            {stats.map((s) => (
+              <div key={s.employee.id}>
+                <p className="text-sm font-medium mb-1 text-gray-900 dark:text-neutral-100">{s.employee.full_name}</p>
+                <ul className="text-sm text-gray-500 dark:text-neutral-400 space-y-0.5">
                   {s.empTasks.map((t: any) => {
                     const seconds = s.taskTimeTotals.get(t.id) ?? 0
                     const hours = (seconds / 3600).toFixed(1)
@@ -162,7 +187,7 @@ export default async function AdminPage() {
                     )
                   })}
                   {s.empTasks.length === 0 && (
-                    <li className="text-gray-300">No tasks assigned</li>
+                    <li className="text-gray-300 dark:text-neutral-600">No tasks assigned</li>
                   )}
                 </ul>
               </div>
