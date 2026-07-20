@@ -148,9 +148,9 @@ export default async function AdminPage() {
                 <p className="text-sm font-medium mb-1 text-gray-900 dark:text-neutral-100">{s.employee.full_name}</p>
                 <ul className="text-sm text-gray-500 dark:text-neutral-400 space-y-0.5">
                   {s.empClockRecords.map((c: any) => {
-                    const inTime = new Date(c.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    const inTime = new Date(c.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
                     const outTime = c.clock_out
-                      ? new Date(c.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      ? new Date(c.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
                       : 'still clocked in'
                     return (
                       <li key={c.id} className="flex justify-between max-w-md">

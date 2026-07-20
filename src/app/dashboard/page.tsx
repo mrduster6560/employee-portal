@@ -57,11 +57,21 @@ export default async function DashboardPage() {
           </div>
 
           {openClockRecord ? (
-            <form action={clockOut.bind(null, openClockRecord.id)}>
-              <button className="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-700">
-                Clock out
-              </button>
-            </form>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 dark:text-neutral-400">
+                Clocked in at{' '}
+                {new Date(openClockRecord.clock_in).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: 'Asia/Kolkata',
+                })}
+              </span>
+              <form action={clockOut.bind(null, openClockRecord.id)}>
+                <button className="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-700">
+                  Clock out
+                </button>
+              </form>
+            </div>
           ) : (
             <form action={clockIn}>
               <button className="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700">
