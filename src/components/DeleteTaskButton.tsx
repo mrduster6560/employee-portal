@@ -1,31 +1,39 @@
 'use client'
+
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function DeleteTaskButton({ taskId }: { taskId: string }) {
-  const router = useRouter()
   const supabase = createClient()
+  const router = useRouter()
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this task? Associated time logs will also be removed.')
-    if (!confirmDelete) return
-
+  async function handleDelete() {
+    if (!confirm('Are you sure you want to delete this task?')) return
+    
+    setIsDeleting(true)
     const { error } = await supabase
       .from('tasks')
       .delete()
       .eq('id', taskId)
 
+    setIsDeleting(false)
+
     if (error) {
-      alert(`Error deleting task: ${error.message}`)
+      alert('Failed to delete task: ' + error.message)
     } else {
-      // Refreshes the current route to fetch the updated task list from the server
       router.refresh()
     }
   }
 
   return (
-    
-      Delete
-    
+    <button
+      onClick={handleDelete}
+      disabled={isDeleting}
+      className="text-xs bg-red-600 hover:bg-red-700 text-white font-medium px-2 py-1 rounded transition-colors disabled:opacity-50"
+    >
+      {isDeleting ? 'Deleting...' : 'Delete'}
+    </button>
   )
 }
