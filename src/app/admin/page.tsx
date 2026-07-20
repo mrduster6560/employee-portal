@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createTask } from './actions'
+import DeleteTaskButton from '@/components/DeleteTaskButton'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -168,7 +169,7 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* Per-task time totals */}
+        {/* Per-task time totals with Delete Actions */}
         <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-neutral-800 rounded-lg shadow-sm p-5">
           <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400 mb-4">Time per task</h2>
           <div className="space-y-4">
@@ -180,9 +181,12 @@ export default async function AdminPage() {
                     const seconds = s.taskTimeTotals.get(t.id) ?? 0
                     const hours = (seconds / 3600).toFixed(1)
                     return (
-                      <li key={t.id} className="flex justify-between max-w-md">
+                      <li key={t.id} className="flex justify-between max-w-md items-center py-1">
                         <span>{t.title}</span>
-                        <span>{hours}h</span>
+                        <div className="flex items-center gap-4">
+                          <span>{hours}h</span>
+                          <DeleteTaskButton taskId={t.id} />
+                        </div>
                       </li>
                     )
                   })}
